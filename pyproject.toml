@@ -11,6 +11,8 @@ dependencies = [
     "infinite-craft>=1.2.2",
 ]
 
+[tool.uv]
+default-groups = ["dev"]
 
 [dependency-groups]
 dev = [

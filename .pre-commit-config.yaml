@@ -1,0 +1,28 @@
+repos:
+  - repo: meta
+    hooks:
+      - id: check-useless-excludes
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: "v4.4.0"
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-ast # check if python files are valid
+      - id: check-added-large-files
+        args: ["--maxkb=5128"]
+      - id: check-merge-conflict # check if merge conflict is included
+      - id: check-yaml
+  - repo: https://github.com/psf/black
+    rev: "23.3.0"
+    hooks:
+      - id: black
+
+  - repo: local
+    hooks:
+      - id: check-elem
+        name: check-element
+        entry: python3 ./validate_commit_restrictions.py
+        language: system
+        require_serial: true
+        files: "^src/coala/\\w+_lab/[\\w\\s]+\\.yaml$"

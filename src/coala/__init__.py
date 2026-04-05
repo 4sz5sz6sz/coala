@@ -8,9 +8,6 @@ from infinitecraft import InfiniteCraft
 
 log = getLogger(__name__)
 
-# Global fusion cache to share discovery results across different labs and sessions
-_FUSION_CACHE: dict[tuple[str, str], str] = {}
-
 
 class Lab:
     """A laboratory for fusing elements and verifying recipes using InfiniteCraft.
@@ -40,7 +37,6 @@ class Lab:
         self.recipes: dict[str, list[str]] = {}
         # Locate the lab directory relative to the package location
         self.lab_path = Path(__file__).parent / lab_name
-        # Instance-level cache for validation to prevent cross-lab contamination
         self._checked_recipes: set[str] = set()
 
     async def start(self):
@@ -105,9 +101,6 @@ class Lab:
             sorted([first_elem.lower(), second_elem.lower()])
         )  # type: ignore (sorting only two elements)
 
-        if fusion_key in _FUSION_CACHE:
-            return _FUSION_CACHE[fusion_key]
-
         def get_element(name: str):
             items = self.game.get_discoveries()
             for item in items:
@@ -115,11 +108,8 @@ class Lab:
                     return item
             raise ValueError(f"Cannot find element of name: {name}")
 
-        try:
-            elem_0 = get_element(first_elem)
-            elem_1 = get_element(second_elem)
-        except ValueError as e:
-            raise e
+        elem_0 = get_element(first_elem)
+        elem_1 = get_element(second_elem)
 
         # Verification using InfiniteCraft API
         result = await self.game.pair(elem_0, elem_1)
@@ -131,7 +121,6 @@ class Lab:
             raise RuntimeError(f"Fusion failed: {first_elem} + {second_elem}")
 
         result_name = result.name.lower()
-        _FUSION_CACHE[fusion_key] = result_name
         return result_name
 
     async def assert_is_fusable(self, target: str | None = None):
@@ -146,7 +135,6 @@ class Lab:
         Raises:
             AssertionError: If verification fails or a cycle is detected.
         """
-        self._checked_recipes.clear()
         if target is None:
             for elem in list(self.recipes.keys()):
                 await self._assert_fusable_recursive(elem, set())
@@ -198,8 +186,12 @@ class Lab:
                 raise AssertionError(
                     f"Recipe mismatch: {ingredients} -> '{result_name}', expected '{target}'."
                 )
+        else:
+            if target.lower() not in ("fire", "earth", "water", "wind"):
+                raise ValueError("recipe does not exist for non primitive elements")
 
         self._checked_recipes.add(target)
+
         visited.remove(target)
 
 
@@ -235,21 +227,24 @@ class CLI:
 import pytest
 
 
-def test_all_lab({lab_name}: Lab):
-    # Check if lab load is successful
-    assert isinstance({lab_name}, Lab)
-    assert {lab_name}.lab_name == "{lab_name}"
+@pytest.fixture(scope="module")
+def lab_name() -> str:
+    return "{lab_name}"
 
 
-@pytest.mark.asyncio
-async def test_lab_integrity({lab_name}: Lab):
+async def test_lab_load(lab: Lab):
+    \"\"\"assert lab fixture is loaded without any error\"\"\"
+    assert isinstance(lab, Lab)
+    assert lab.lab_name == "{lab_name}"
+
+
+async def test_lab_integrity(lab: Lab):
     \"\"\"Verifies that all recipes in the lab are structurally sound and fusable.\"\"\"
-    await {lab_name}.assert_is_fusable()
+    await lab.assert_is_fusable()
 
 
-@pytest.mark.asyncio
-async def test_fuse_fire_and_water({lab_name}: Lab):
-    result = await {lab_name}.fuse("fire", "water")
+async def test_fuse_fire_and_water(lab: Lab):
+    result = await lab.fuse("fire", "water")
     assert result == "steam"
 """
         with open(test_dir / "test_each_elems.py", "w", encoding="utf-8") as f:

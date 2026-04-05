@@ -2,19 +2,22 @@ from coala import Lab
 import pytest
 
 
-def test_all_lab(tutorial_lab: Lab):
-    # lab load 가 문제없는지 확인함
-    assert isinstance(tutorial_lab, Lab)
-    assert tutorial_lab.lab_name == "tutorial_lab"
+@pytest.fixture(scope="module")
+def lab_name() -> str:
+    return "tutorial_lab"
 
 
-@pytest.mark.asyncio
-async def test_lab_integrity(tutorial_lab: Lab):
+async def test_lab_load(lab: Lab):
+    """assert lab fixture is loaded without any error"""
+    assert isinstance(lab, Lab)
+    assert lab.lab_name == "tutorial_lab"
+
+
+async def test_lab_integrity(lab: Lab):
     """Verifies that all recipes in the lab are structurally sound and fusable."""
-    await tutorial_lab.assert_is_fusable()
+    await lab.assert_is_fusable()
 
 
-@pytest.mark.asyncio
-async def test_fuse_fire_and_water(tutorial_lab: Lab):
-    result = await tutorial_lab.fuse("fire", "water")
+async def test_fuse_fire_and_water(lab: Lab):
+    result = await lab.fuse("fire", "water")
     assert result == "steam"

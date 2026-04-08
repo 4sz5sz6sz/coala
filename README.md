@@ -7,15 +7,46 @@ Coala 연구소에 오신 것을 환영합니다! 당신은 이제 연구소의 
 - **기본 원소:** 공기(AIR), 흙(EARTH), 불(FIRE), 물(WATER)의 4가지 원소가 기초 자산으로 제공됩니다.
 - **원소 합성:** 기본 원소들을 정교하게 조합하여 세상에 없던 복합 원소들을 만들어낼 수 있습니다.
 
-## 준비 과정
+---
 
-> [uv](https://docs.astral.sh/uv/) 설치 및 환경 구성
+## 🐣 초보자를 위한 시작 가이드 (Windows / Mac 공통)
 
-`uv`를 사용하여 프로젝트의 의존성을 빠르고 안전하게 관리합니다.
+Git이나 GitHub을 처음 사용하시는 분들도 아래 순서대로 따라오시면 바로 연구에 참여하실 수 있습니다.
+
+### 1. 기본 도구 설치
+*   **Git 설치:** 코드 버전 관리를 위한 필수 도구입니다. [설치 가이드 확인](https://shorturl.at/YNX3k)
+*   **GitHub CLI (gh) 설치:** 터미널에서 GitHub 기능을 편리하게 사용하게 해줍니다. [설치 가이드 확인](https://shorturl.at/VPzQL)
+*   **GitHub 회원가입:** [여기서 가입하세요](https://github.com/signup)
+*   **VS Code 설치 (선택):** 사용할 에디터가 없다면 강력 추천합니다. [설치 가이드 확인](https://shorturl.at/KGQJx)
+*   **SCM Breeze 설치 (고급용, 선택):** git 커맨드에 익숙하다면, 단축키 설정해서 생산성도 같이 올려보세요. 세션에서 scm breeze command 를 병기해서 공유드릴 예정입니다. https://github.com/scmbreeze/scm_breeze. 터미널에 익숙지 않은 사용자는 단축키 사용을 권장하지 않습니다.
+
+### 2. 계정 및 보안 설정
+*   **Git SSH 등록:** 내 컴퓨터와 GitHub을 안전하게 연결합니다. [SSH 생성 및 등록 가이드](https://shorturl.at/omzYb)
+*   **GitHub 로그인:** 터미널(또는 명령 프롬프트)을 열고 아래 명령어를 입력하여 로그인하세요.
+    ```bash
+    $ gh auth login
+    ```
+    (가이드에 따라 웹브라우저 인증을 완료하면 됩니다.)
+
+### 3. 연구소 준비 (Fork & Clone)
+이제 본인의 연구실(저장소)을 만들고 내 컴퓨터로 가져옵니다. 터미널에서 다음을 입력하세요.
+```bash
+# 본인의 계정으로 저장소를 포크하고 로컬로 복제합니다.
+$ gh repo fork https://github.com/[REPO_OWNER]/coala.git --clone
+
+# 복제된 폴더로 이동합니다.
+$ cd coala
+```
+
+### 4. 개발 환경 구성 (uv)
+이 프로젝트는 `uv`를 사용하여 환경을 관리합니다.
 
 ```bash
-# uv 설치
+# uv 설치 (Mac/Linux)
 $ curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# uv 설치 (Windows - PowerShell)
+$ powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 # 프로젝트 의존성 동기화 및 가상환경 생성
 $ uv sync
@@ -27,25 +58,7 @@ $ uv run pre-commit install
 $ uv run pytest
 ```
 
-> [GH](https://cli.github.com/) (선택 사항)
-
-명령줄에서 GitHub 작업을 효율적으로 처리하려면 `gh`를 활용하세요.
-
-```bash
-# 설치 (macOS 기준)
-$ brew install gh
-
-# GitHub 계정 인증
-$ gh auth login
-```
-
-**저장소 포크 및 로컬 복제**
-```bash
-# 연구용 개인 저장소 생성 및 복제
-$ gh repo fork https://github.com/[REPO_OWNER]/coala.git --clone
-
-$ cd coala
-```
+---
 
 ## 원소 합성 실험
 
